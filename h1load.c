@@ -227,6 +227,7 @@ int arg_pctl = 0;     // report percentiles.
 int arg_rate = 0;     // connection & request rate limit
 int arg_accu = 0;     // more accurate req/time measurements in keep-alive
 int arg_hscd = 0;     // HTTP status code distribution
+int arg_keep_uptime = 0;
 char *arg_url;
 char *arg_hdr;
 #if defined(USE_SSL)
@@ -1881,6 +1882,7 @@ __attribute__((noreturn)) void usage(const char *name, int code)
 	    "  -I                 use HEAD instead of GET\n"
 	    "  -S                 show HTTP status codes distribution\n"
 	    "  -h                 display this help\n"
+	    "  -u                 keep time as runtime\n"
 	    "  -v                 increase verbosity\n"
 #if defined(USE_SSL)
 	    "SSL options:\n"
@@ -2241,13 +2243,23 @@ void summary()
 	else
 		interval = 1.0;
 
-	printf("%10lu %5lu %8llu %8llu %14llu %6lu ",
-	       arg_long ? (unsigned long)now.tv_sec : (unsigned long)(now.tv_sec - start_date.tv_sec),
-	       (unsigned long)cur_conn,
-	       (unsigned long long)tot_conn,
-	       (unsigned long long)tot_req,
-	       (unsigned long long)tot_rcvd,
-	       (unsigned long)tot_err);
+	if (arg_keep_uptime) {
+		printf("%10lu %5lu %8llu %8llu %14llu %6lu ",
+		       (unsigned long)(now.tv_sec - start_date.tv_sec),
+		       (unsigned long)cur_conn,
+		       (unsigned long long)tot_conn,
+		       (unsigned long long)tot_req,
+		       (unsigned long long)tot_rcvd,
+		       (unsigned long)tot_err);
+	} else {
+		printf("%10lu %5lu %8llu %8llu %14llu %6lu ",
+		       arg_long ? (unsigned long)now.tv_sec : (unsigned long)(now.tv_sec - start_date.tv_sec),
+		       (unsigned long)cur_conn,
+		       (unsigned long long)tot_conn,
+		       (unsigned long long)tot_req,
+		       (unsigned long long)tot_rcvd,
+		       (unsigned long)tot_err);
+	}
 
 	bytes = tot_rcvd - prev_totb;
 	if (arg_ovrp) {
@@ -2610,6 +2622,8 @@ int main(int argc, char **argv)
 			arg_hscd++;
 		else if (strcmp(argv[0], "-h") == 0)
 			usage(name, 0);
+		else if (strcmp(argv[0]. "-u") == 0)
+			arg_keep_uptime = 1;
 #if defined(USE_SSL)
 		else if (strcmp(argv[0], "--cipher-list") == 0) {
 			if (argc < 2)

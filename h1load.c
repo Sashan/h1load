@@ -2622,7 +2622,7 @@ int main(int argc, char **argv)
 			arg_hscd++;
 		else if (strcmp(argv[0], "-h") == 0)
 			usage(name, 0);
-		else if (strcmp(argv[0]. "-u") == 0)
+		else if (strcmp(argv[0], "-u") == 0)
 			arg_keep_uptime = 1;
 #if defined(USE_SSL)
 		else if (strcmp(argv[0], "--cipher-list") == 0) {
